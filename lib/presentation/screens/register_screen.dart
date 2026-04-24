@@ -44,80 +44,47 @@ class _RegisterView extends StatelessWidget {
   }
 }
 
-class _RegisterForm extends StatefulWidget {
+class _RegisterForm extends StatelessWidget {
   const _RegisterForm({super.key});
-
-  @override
-  State<_RegisterForm> createState() => _RegisterFormState();
-}
-
-class _RegisterFormState extends State<_RegisterForm> {
-
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
 
     final registerCubit =  context.watch<RegisterCubit>();
+    final usernameInput = registerCubit.state.username;
+    final passwordInput = registerCubit.state.password;
+    final emailInput = registerCubit.state.email;
 
     return Form(
-      key: _formKey,
       child: Column(
         children: [
           CustomTextFormField(
             label: 'Nombre de usuario',
-            onChanged: (value) => registerCubit.usernameChanged(value),
-            validator: (value) {
-
-              if(value == null || value.isEmpty) return "Campo requerido";
-              if(value.trim().isEmpty) return "Campo requerido";
-              if(value.length < 6) return "Más de 6 letras";
-
-              return null;
-            },
+            onChanged: registerCubit.usernameChanged,
+            errorMessage: usernameInput.messageError,
           ),
 
           const SizedBox(height: 10),
 
           CustomTextFormField(
             label: 'Correo electrónico',
-            onChanged: (value) => registerCubit.emailChanged(value),
-            validator: (value){
-
-              if(value == null || value.isEmpty) return 'Campo requerido';
-              if(value.trim().isEmpty) return 'Campo requerido';
-              final emailRegExp = RegExp(
-                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-              );
-
-              if ( !emailRegExp.hasMatch(value) ) return 'No tiene formato de correo';
-
-              return null;
-            },
+            onChanged: registerCubit.emailChanged,
+            errorMessage: emailInput.messageError,
           ),
 
           const SizedBox(height: 10),
 
           CustomTextFormField(
             label: "Contraseña",
-            onChanged: (value) => registerCubit.passwordChanged(value),
+            onChanged: registerCubit.passwordChanged,
             obscureText: true,
-            validator: (value){
-              if(value == null || value.isEmpty) return 'Campo requerido';
-              if(value.trim().isEmpty) return 'Campo requerido';
-              if(value.length < 6) return 'Mas de 6 letras';
-
-              return null;
-            },
+            errorMessage: passwordInput.messageError,
           ),
 
           const SizedBox(height: 20),
 
           FilledButton.tonalIcon(
               onPressed: (){
-                final isValid = _formKey.currentState!.validate();
-
-                if(!isValid) return;
 
                 registerCubit.onSubmit();
 
